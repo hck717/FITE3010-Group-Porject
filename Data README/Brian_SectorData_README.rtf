@@ -1,0 +1,433 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2759
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fswiss\fcharset0 Helvetica;\f1\fnil\fcharset0 AppleColorEmoji;\f2\froman\fcharset0 Times-Bold;
+\f3\ftech\fcharset77 Symbol;\f4\froman\fcharset0 Times-Roman;}
+{\colortbl;\red255\green255\blue255;\red0\green0\blue0;\red109\green109\blue109;}
+{\*\expandedcolortbl;;\cssrgb\c0\c0\c0;\cssrgb\c50196\c50196\c50196;}
+\paperw11900\paperh16840\margl1440\margr1440\vieww11520\viewh8400\viewkind0
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
+
+\f0\fs24 \cf0 # Market Features Engineering Pipeline\
+\
+This project builds a **feature engineering pipeline** for U.S. equity market analysis using sector ETFs, Treasury yields, and commodity proxies.  \
+The output is a **master dataset (`market_features_master.csv`)** that combines raw prices, returns, engineered features, and z-scored versions for modeling or research.\
+\
+---\
+\
+## 
+\f1 \uc0\u9881 \u65039 
+\f0  How the Code Works\
+\
+1. **Data Collection**\
+   - Downloads daily price data for **SPY** (S&P 500 ETF) and **sector ETFs** (XLK, XLF, XLE, XLV, XLU, XLY, XLP, XLB, XLRE, XLC).\
+   - Downloads **Treasury yield proxies** (`^TNX` for 10y, `^FVX` for 5y).\
+   - Downloads **commodity futures** (Crude Oil `CL=F`, Copper `HG=F`).\
+\
+2. **Preprocessing**\
+   - Flattens Yahoo Finance\'92s multi-index columns.\
+   - Uses **Adjusted Close** prices if available, otherwise falls back to Close.\
+   - Computes **daily returns**.\
+\
+3. **Feature Engineering**\
+   - **Relative Strength Ratios**: XLK/SPY, XLU/SPY, XLF/SPY.\
+   - **Growth vs. Defensive Proxy**: Rolling mean of cyclical vs. defensive sector returns.\
+   - **Seasonality**: Average monthly SPY returns.\
+   - **Breadth**: Number of sectors outperforming SPY over 60 days.\
+   - **Volatility Ratio**: Tech vs. Utilities volatility.\
+   - **Treasury Yields**: 10y, 5y, and spread.\
+   - **Commodities**: 60-day returns of crude oil and copper.\
+   - **Defensive vs. Cyclical Ratio**: Rolling ratio of defensive vs. cyclical ETF baskets.\
+   - **Cross-Sector Correlation**: Average 60-day correlation across sectors.\
+\
+4. **Z-Scoring**\
+   - Each feature is standardized using a **252-day rolling mean and standard deviation**.\
+   - Produces a z-scored version of each feature for comparability.\
+\
+5. **Master Dataset**\
+   - Combines:\
+     - Raw prices\
+     - Returns\
+     - Ratios\
+     - Engineered features\
+     - Z-scores\
+   - Saves to **`market_features_master.csv`**.\
+\
+---\
+\
+## 
+\f1 \uc0\u55357 \u56514 
+\f0  Using the Generated CSV\
+\
+The file `market_features_master.csv` contains a **multi-level column structure**:\
+\
+- **Prices**: Adjusted close prices of SPY and sector ETFs.\
+- **Returns**: Daily % changes.\
+- **Ratios**: Relative strength ratios (e.g., XLK/SPY).\
+- **Features**: Engineered features (see table below).\
+- **ZScores**: Standardized versions of features.\
+\
+### Example Usage in Python\
+\
+```python\
+import pandas as pd\
+\
+# Load dataset\
+df = pd.read_csv("market_features_master.csv", index_col=0, parse_dates=True)\
+\
+# Access engineered features\
+features = df["Features"]\
+\
+# Example: Plot Growth vs Defensive feature\
+features["GrowthMinusDef"].plot(title="Growth vs Defensive Rotation")\
+\
+\
+\
+\
+\
+
+\itap1\trowd \taflags0 \trgaph108\trleft-108 \trbrdrt\brdrnil \trbrdrl\brdrnil \trbrdrr\brdrnil 
+\clvertalc \clshdrawnil \clwWidth2284\clftsWidth3 \clmart10 \clmarl10 \clmarb10 \clmarr10 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrnil \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx2160
+\clvertalc \clshdrawnil \clwWidth5118\clftsWidth3 \clmart10 \clmarl10 \clmarb10 \clmarr10 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrnil \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx4320
+\clvertalc \clshdrawnil \clwWidth3466\clftsWidth3 \clmart10 \clmarl10 \clmarb10 \clmarr10 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrnil \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx6480
+\clvertalc \clshdrawnil \clwWidth4450\clftsWidth3 \clmart10 \clmarl10 \clmarb10 \clmarr10 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrnil \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx8640
+\pard\intbl\itap1\pardeftab720\qc\partightenfactor0
+
+\f2\b \cf0 \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 Feature\cell 
+\pard\intbl\itap1\pardeftab720\qc\partightenfactor0
+\cf0 Description\cell 
+\pard\intbl\itap1\pardeftab720\qc\partightenfactor0
+\cf0 Why It Matters for SPY\cell 
+\pard\intbl\itap1\pardeftab720\qc\partightenfactor0
+\cf0 Directional Relationship (
+\f3\b0 \uc0\u8593 
+\f2\b  Feature 
+\f3\b0 \uc0\u8594 
+\f2\b  Effect on SPY)\cell \row
+
+\itap1\trowd \taflags0 \trgaph108\trleft-108 \trbrdrl\brdrnil \trbrdrr\brdrnil 
+\clvertalc \clshdrawnil \clwWidth2284\clftsWidth3 \clmart10 \clmarl10 \clmarb10 \clmarr10 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrnil \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx2160
+\clvertalc \clshdrawnil \clwWidth5118\clftsWidth3 \clmart10 \clmarl10 \clmarb10 \clmarr10 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrnil \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx4320
+\clvertalc \clshdrawnil \clwWidth3466\clftsWidth3 \clmart10 \clmarl10 \clmarb10 \clmarr10 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrnil \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx6480
+\clvertalc \clshdrawnil \clwWidth4450\clftsWidth3 \clmart10 \clmarl10 \clmarb10 \clmarr10 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrnil \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx8640
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+\cf0 SPY_Return
+\f4\b0 \cell 
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+\cf0 Daily % change in SPY\cell 
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+\cf0 Baseline target variable for analysis\cell 
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+\cf0 N/A (this is SPY)\cell \row
+
+\itap1\trowd \taflags0 \trgaph108\trleft-108 \trbrdrl\brdrnil \trbrdrr\brdrnil 
+\clvertalc \clshdrawnil \clwWidth2284\clftsWidth3 \clmart10 \clmarl10 \clmarb10 \clmarr10 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrnil \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx2160
+\clvertalc \clshdrawnil \clwWidth5118\clftsWidth3 \clmart10 \clmarl10 \clmarb10 \clmarr10 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrnil \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx4320
+\clvertalc \clshdrawnil \clwWidth3466\clftsWidth3 \clmart10 \clmarl10 \clmarb10 \clmarr10 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrnil \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx6480
+\clvertalc \clshdrawnil \clwWidth4450\clftsWidth3 \clmart10 \clmarl10 \clmarb10 \clmarr10 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrnil \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx8640
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+
+\f2\b \cf0 GrowthMinusDef
+\f4\b0 \cell 
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+\cf0 Growth/cyclical sectors (XLK, XLF, XLE, XLY) minus defensive (XLU, XLP, XLV)\cell 
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+\cf0 Captures risk\uc0\u8209 on vs. risk\u8209 off rotation\cell 
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+
+\f3 \cf0 \uc0\u8593 
+\f4  GrowthMinusDef 
+\f3 \uc0\u8594 
+\f4  SPY 
+\f3 \uc0\u8593 
+\f4  (risk\uc0\u8209 on)\cell \row
+
+\itap1\trowd \taflags0 \trgaph108\trleft-108 \trbrdrl\brdrnil \trbrdrr\brdrnil 
+\clvertalc \clshdrawnil \clwWidth2284\clftsWidth3 \clmart10 \clmarl10 \clmarb10 \clmarr10 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrnil \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx2160
+\clvertalc \clshdrawnil \clwWidth5118\clftsWidth3 \clmart10 \clmarl10 \clmarb10 \clmarr10 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrnil \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx4320
+\clvertalc \clshdrawnil \clwWidth3466\clftsWidth3 \clmart10 \clmarl10 \clmarb10 \clmarr10 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrnil \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx6480
+\clvertalc \clshdrawnil \clwWidth4450\clftsWidth3 \clmart10 \clmarl10 \clmarb10 \clmarr10 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrnil \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx8640
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+
+\f2\b \cf0 XLK_SPY
+\f4\b0 \cell 
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+\cf0 Tech vs. SPY relative strength\cell 
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+\cf0 Tech leadership often drives market rallies\cell 
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+
+\f3 \cf0 \uc0\u8593 
+\f4  XLK_SPY 
+\f3 \uc0\u8594 
+\f4  SPY 
+\f3 \uc0\u8593 
+\f4 \cell \row
+
+\itap1\trowd \taflags0 \trgaph108\trleft-108 \trbrdrl\brdrnil \trbrdrr\brdrnil 
+\clvertalc \clshdrawnil \clwWidth2284\clftsWidth3 \clmart10 \clmarl10 \clmarb10 \clmarr10 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrnil \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx2160
+\clvertalc \clshdrawnil \clwWidth5118\clftsWidth3 \clmart10 \clmarl10 \clmarb10 \clmarr10 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrnil \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx4320
+\clvertalc \clshdrawnil \clwWidth3466\clftsWidth3 \clmart10 \clmarl10 \clmarb10 \clmarr10 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrnil \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx6480
+\clvertalc \clshdrawnil \clwWidth4450\clftsWidth3 \clmart10 \clmarl10 \clmarb10 \clmarr10 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrnil \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx8640
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+
+\f2\b \cf0 XLU_SPY
+\f4\b0 \cell 
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+\cf0 Utilities vs. SPY relative strength\cell 
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+\cf0 Utilities outperform in defensive regimes\cell 
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+
+\f3 \cf0 \uc0\u8593 
+\f4  XLU_SPY 
+\f3 \uc0\u8594 
+\f4  SPY 
+\f3 \uc0\u8595 
+\f4 \cell \row
+
+\itap1\trowd \taflags0 \trgaph108\trleft-108 \trbrdrl\brdrnil \trbrdrr\brdrnil 
+\clvertalc \clshdrawnil \clwWidth2284\clftsWidth3 \clmart10 \clmarl10 \clmarb10 \clmarr10 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrnil \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx2160
+\clvertalc \clshdrawnil \clwWidth5118\clftsWidth3 \clmart10 \clmarl10 \clmarb10 \clmarr10 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrnil \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx4320
+\clvertalc \clshdrawnil \clwWidth3466\clftsWidth3 \clmart10 \clmarl10 \clmarb10 \clmarr10 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrnil \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx6480
+\clvertalc \clshdrawnil \clwWidth4450\clftsWidth3 \clmart10 \clmarl10 \clmarb10 \clmarr10 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrnil \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx8640
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+
+\f2\b \cf0 XLF_SPY
+\f4\b0 \cell 
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+\cf0 Financials vs. SPY relative strength\cell 
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+\cf0 Financial strength signals economic optimism\cell 
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+
+\f3 \cf0 \uc0\u8593 
+\f4  XLF_SPY 
+\f3 \uc0\u8594 
+\f4  SPY 
+\f3 \uc0\u8593 
+\f4 \cell \row
+
+\itap1\trowd \taflags0 \trgaph108\trleft-108 \trbrdrl\brdrnil \trbrdrr\brdrnil 
+\clvertalc \clshdrawnil \clwWidth2284\clftsWidth3 \clmart10 \clmarl10 \clmarb10 \clmarr10 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrnil \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx2160
+\clvertalc \clshdrawnil \clwWidth5118\clftsWidth3 \clmart10 \clmarl10 \clmarb10 \clmarr10 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrnil \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx4320
+\clvertalc \clshdrawnil \clwWidth3466\clftsWidth3 \clmart10 \clmarl10 \clmarb10 \clmarr10 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrnil \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx6480
+\clvertalc \clshdrawnil \clwWidth4450\clftsWidth3 \clmart10 \clmarl10 \clmarb10 \clmarr10 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrnil \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx8640
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+
+\f2\b \cf0 Breadth
+\f4\b0 \cell 
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+\cf0 # of sectors outperforming SPY over 60 days\cell 
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+\cf0 Broad participation = healthier rallies\cell 
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+
+\f3 \cf0 \uc0\u8593 
+\f4  Breadth 
+\f3 \uc0\u8594 
+\f4  SPY 
+\f3 \uc0\u8593 
+\f4 \cell \row
+
+\itap1\trowd \taflags0 \trgaph108\trleft-108 \trbrdrl\brdrnil \trbrdrr\brdrnil 
+\clvertalc \clshdrawnil \clwWidth2284\clftsWidth3 \clmart10 \clmarl10 \clmarb10 \clmarr10 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrnil \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx2160
+\clvertalc \clshdrawnil \clwWidth5118\clftsWidth3 \clmart10 \clmarl10 \clmarb10 \clmarr10 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrnil \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx4320
+\clvertalc \clshdrawnil \clwWidth3466\clftsWidth3 \clmart10 \clmarl10 \clmarb10 \clmarr10 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrnil \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx6480
+\clvertalc \clshdrawnil \clwWidth4450\clftsWidth3 \clmart10 \clmarl10 \clmarb10 \clmarr10 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrnil \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx8640
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+
+\f2\b \cf0 Vol_Ratio_XLK_XLU
+\f4\b0 \cell 
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+\cf0 Volatility of Tech vs. Utilities\cell 
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+\cf0 Higher tech vol signals risk appetite or instability\cell 
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+
+\f3 \cf0 \uc0\u8593 
+\f4  Vol_Ratio 
+\f3 \uc0\u8594 
+\f4  mixed: can precede SPY 
+\f3 \uc0\u8593 
+\f4  (risk\uc0\u8209 on) or SPY 
+\f3 \uc0\u8595 
+\f4  (instability)\cell \row
+
+\itap1\trowd \taflags0 \trgaph108\trleft-108 \trbrdrl\brdrnil \trbrdrr\brdrnil 
+\clvertalc \clshdrawnil \clwWidth2284\clftsWidth3 \clmart10 \clmarl10 \clmarb10 \clmarr10 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrnil \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx2160
+\clvertalc \clshdrawnil \clwWidth5118\clftsWidth3 \clmart10 \clmarl10 \clmarb10 \clmarr10 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrnil \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx4320
+\clvertalc \clshdrawnil \clwWidth3466\clftsWidth3 \clmart10 \clmarl10 \clmarb10 \clmarr10 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrnil \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx6480
+\clvertalc \clshdrawnil \clwWidth4450\clftsWidth3 \clmart10 \clmarl10 \clmarb10 \clmarr10 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrnil \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx8640
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+
+\f2\b \cf0 DGS10
+\f4\b0 \cell 
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+\cf0 10\uc0\u8209 year Treasury yield\cell 
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+\cf0 Rising long rates can pressure equities via discounting\cell 
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+
+\f3 \cf0 \uc0\u8593 
+\f4  DGS10 
+\f3 \uc0\u8594 
+\f4  SPY 
+\f3 \uc0\u8595 
+\f4  (generally)\cell \row
+
+\itap1\trowd \taflags0 \trgaph108\trleft-108 \trbrdrl\brdrnil \trbrdrr\brdrnil 
+\clvertalc \clshdrawnil \clwWidth2284\clftsWidth3 \clmart10 \clmarl10 \clmarb10 \clmarr10 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrnil \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx2160
+\clvertalc \clshdrawnil \clwWidth5118\clftsWidth3 \clmart10 \clmarl10 \clmarb10 \clmarr10 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrnil \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx4320
+\clvertalc \clshdrawnil \clwWidth3466\clftsWidth3 \clmart10 \clmarl10 \clmarb10 \clmarr10 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrnil \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx6480
+\clvertalc \clshdrawnil \clwWidth4450\clftsWidth3 \clmart10 \clmarl10 \clmarb10 \clmarr10 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrnil \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx8640
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+
+\f2\b \cf0 DGS5
+\f4\b0 \cell 
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+\cf0 5\uc0\u8209 year Treasury yield\cell 
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+\cf0 Tracks Fed policy expectations\cell 
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+
+\f3 \cf0 \uc0\u8593 
+\f4  DGS5 
+\f3 \uc0\u8594 
+\f4  SPY 
+\f3 \uc0\u8595 
+\f4  (tighter policy)\cell \row
+
+\itap1\trowd \taflags0 \trgaph108\trleft-108 \trbrdrl\brdrnil \trbrdrr\brdrnil 
+\clvertalc \clshdrawnil \clwWidth2284\clftsWidth3 \clmart10 \clmarl10 \clmarb10 \clmarr10 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrnil \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx2160
+\clvertalc \clshdrawnil \clwWidth5118\clftsWidth3 \clmart10 \clmarl10 \clmarb10 \clmarr10 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrnil \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx4320
+\clvertalc \clshdrawnil \clwWidth3466\clftsWidth3 \clmart10 \clmarl10 \clmarb10 \clmarr10 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrnil \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx6480
+\clvertalc \clshdrawnil \clwWidth4450\clftsWidth3 \clmart10 \clmarl10 \clmarb10 \clmarr10 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrnil \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx8640
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+
+\f2\b \cf0 Spread (10y\'965y)
+\f4\b0 \cell 
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+\cf0 Yield curve slope\cell 
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+\cf0 Steepening = growth optimism; inversion = recession risk\cell 
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+
+\f3 \cf0 \uc0\u8593 
+\f4  Spread 
+\f3 \uc0\u8594 
+\f4  SPY 
+\f3 \uc0\u8593 
+\f4 \cell \row
+
+\itap1\trowd \taflags0 \trgaph108\trleft-108 \trbrdrl\brdrnil \trbrdrr\brdrnil 
+\clvertalc \clshdrawnil \clwWidth2284\clftsWidth3 \clmart10 \clmarl10 \clmarb10 \clmarr10 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrnil \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx2160
+\clvertalc \clshdrawnil \clwWidth5118\clftsWidth3 \clmart10 \clmarl10 \clmarb10 \clmarr10 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrnil \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx4320
+\clvertalc \clshdrawnil \clwWidth3466\clftsWidth3 \clmart10 \clmarl10 \clmarb10 \clmarr10 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrnil \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx6480
+\clvertalc \clshdrawnil \clwWidth4450\clftsWidth3 \clmart10 \clmarl10 \clmarb10 \clmarr10 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrnil \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx8640
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+
+\f2\b \cf0 DefCyc_Ratio
+\f4\b0 \cell 
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+\cf0 Defensive vs. cyclical sector ratio\cell 
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+\cf0 Defensive leadership signals caution\cell 
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+
+\f3 \cf0 \uc0\u8593 
+\f4  DefCyc_Ratio 
+\f3 \uc0\u8594 
+\f4  SPY 
+\f3 \uc0\u8595 
+\f4 \cell \row
+
+\itap1\trowd \taflags0 \trgaph108\trleft-108 \trbrdrl\brdrnil \trbrdrr\brdrnil 
+\clvertalc \clshdrawnil \clwWidth2284\clftsWidth3 \clmart10 \clmarl10 \clmarb10 \clmarr10 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrnil \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx2160
+\clvertalc \clshdrawnil \clwWidth5118\clftsWidth3 \clmart10 \clmarl10 \clmarb10 \clmarr10 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrnil \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx4320
+\clvertalc \clshdrawnil \clwWidth3466\clftsWidth3 \clmart10 \clmarl10 \clmarb10 \clmarr10 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrnil \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx6480
+\clvertalc \clshdrawnil \clwWidth4450\clftsWidth3 \clmart10 \clmarl10 \clmarb10 \clmarr10 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrnil \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx8640
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+
+\f2\b \cf0 Avg_Sector_Corr
+\f4\b0 \cell 
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+\cf0 Average 60\uc0\u8209 day correlation across sectors\cell 
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+\cf0 High correlation = systemic risk; low = diversification\cell 
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+
+\f3 \cf0 \uc0\u8593 
+\f4  Corr 
+\f3 \uc0\u8594 
+\f4  SPY 
+\f3 \uc0\u8595 
+\f4  (fragile rallies)\cell \row
+
+\itap1\trowd \taflags0 \trgaph108\trleft-108 \trbrdrl\brdrnil \trbrdrr\brdrnil 
+\clvertalc \clshdrawnil \clwWidth2284\clftsWidth3 \clmart10 \clmarl10 \clmarb10 \clmarr10 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrnil \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx2160
+\clvertalc \clshdrawnil \clwWidth5118\clftsWidth3 \clmart10 \clmarl10 \clmarb10 \clmarr10 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrnil \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx4320
+\clvertalc \clshdrawnil \clwWidth3466\clftsWidth3 \clmart10 \clmarl10 \clmarb10 \clmarr10 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrnil \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx6480
+\clvertalc \clshdrawnil \clwWidth4450\clftsWidth3 \clmart10 \clmarl10 \clmarb10 \clmarr10 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrnil \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx8640
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+
+\f2\b \cf0 Crude_60dRet
+\f4\b0 \cell 
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+\cf0 60\uc0\u8209 day return of crude oil\cell 
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+\cf0 Oil strength can mean growth or inflation\cell 
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+
+\f3 \cf0 \uc0\u8593 
+\f4  Crude 
+\f3 \uc0\u8594 
+\f4  SPY 
+\f3 \uc0\u8593 
+\f4  if growth, 
+\f3 \uc0\u8595 
+\f4  if inflation fears\cell \row
+
+\itap1\trowd \taflags0 \trgaph108\trleft-108 \trbrdrl\brdrnil \trbrdrr\brdrnil 
+\clvertalc \clshdrawnil \clwWidth2284\clftsWidth3 \clmart10 \clmarl10 \clmarb10 \clmarr10 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrnil \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx2160
+\clvertalc \clshdrawnil \clwWidth5118\clftsWidth3 \clmart10 \clmarl10 \clmarb10 \clmarr10 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrnil \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx4320
+\clvertalc \clshdrawnil \clwWidth3466\clftsWidth3 \clmart10 \clmarl10 \clmarb10 \clmarr10 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrnil \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx6480
+\clvertalc \clshdrawnil \clwWidth4450\clftsWidth3 \clmart10 \clmarl10 \clmarb10 \clmarr10 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrnil \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx8640
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+
+\f2\b \cf0 Copper_60dRet
+\f4\b0 \cell 
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+\cf0 60\uc0\u8209 day return of copper\cell 
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+\cf0 \'93Dr. Copper\'94 = global growth barometer\cell 
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+
+\f3 \cf0 \uc0\u8593 
+\f4  Copper 
+\f3 \uc0\u8594 
+\f4  SPY 
+\f3 \uc0\u8593 
+\f4 \cell \row
+
+\itap1\trowd \taflags0 \trgaph108\trleft-108 \trbrdrl\brdrnil \trbrdrt\brdrnil \trbrdrr\brdrnil 
+\clvertalc \clshdrawnil \clwWidth2284\clftsWidth3 \clmart10 \clmarl10 \clmarb10 \clmarr10 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrnil \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx2160
+\clvertalc \clshdrawnil \clwWidth5118\clftsWidth3 \clmart10 \clmarl10 \clmarb10 \clmarr10 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrnil \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx4320
+\clvertalc \clshdrawnil \clwWidth3466\clftsWidth3 \clmart10 \clmarl10 \clmarb10 \clmarr10 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrnil \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx6480
+\clvertalc \clshdrawnil \clwWidth4450\clftsWidth3 \clmart10 \clmarl10 \clmarb10 \clmarr10 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrnil \clpadt20 \clpadl20 \clpadb20 \clpadr20 \gaph\cellx8640
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+
+\f2\b \cf0 Seasonality
+\f4\b0 \cell 
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+\cf0 Avg monthly SPY returns\cell 
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+\cf0 Captures recurring calendar effects\cell 
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+
+\f3 \cf0 \uc0\u8593 
+\f4  Seasonality (positive months) 
+\f3 \uc0\u8594 
+\f4  SPY 
+\f3 \uc0\u8593 
+\f4 \cell \lastrow\row
+}
