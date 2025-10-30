@@ -53,7 +53,7 @@ Raw price columns (`open`, `high`, `low`, `close`, `volume`) should be standardi
 ---
 
 ### 💾 Output
-- **File name:** `spy_features_full_v2.csv`  
+- **File name:** `spy_fx_flows.csv`  
 - **Shape:** ~ 2,600 rows × 14 columns  
 - **Each row:** one NYSE trading day  
 - **Each column:** one engineered feature for SPY prediction
@@ -97,3 +97,4 @@ This table explains the intuition behind each engineered feature, its meaning, a
 | **usdjpy_ret5** | 5-day USD/JPY return | Yen weakness fuels carry-trade risk-on flows | ↑ = SPY ↑ |
 | **usd_strength** | Composite USD index (z-score) | Measures broad USD pressure on global liquidity | ↑ = SPY ↓ (tighter liquidity) |
 | **breadth_proxy** | RSP/SPY − 1 ratio | Tracks equal-weight vs cap-weight leadership; breadth confirmation | ↑ = SPY ↑ (broad participation) |
+
