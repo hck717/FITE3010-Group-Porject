@@ -61,6 +61,26 @@ The CSV contains the following columns:
 
 ---
 
+## ⚠️ Notes and Reminders
+
+- **NaN / Empty Texts**: Articles with missing titles or descriptions are handled by filling with empty strings. If no text is available, sentiment defaults to `0` (neutral).
+- **Daily Cap**: Only the first 10 articles per day are kept to avoid bias from high-volume news days.
+- **Model Limitations**:
+  - The sentiment model is trained on financial news but may misclassify nuanced or ambiguous headlines.
+  - Scores are **continuous** between -1 and +1, but interpretation should be contextual.
+- **Performance**: Running inference on large datasets may be slow without GPU acceleration.
+
+---
+
+## 📊 Use Cases
+
+- **Market Sentiment Index**: Use `daily_avg` as a proxy for investor mood around SPY.
+- **Event Studies**: Align sentiment spikes with SPY returns or volatility.
+- **Feature Engineering**: Incorporate sentiment scores into trading models alongside price/volume features.
+
+---
+
+
 ## 📊 Visualizing Daily Sentiment Trends
 
 You can use the dataset to plot how sentiment evolves over time.  
@@ -82,24 +102,5 @@ plt.xlabel("Date")
 plt.ylabel("Sentiment Score (-1 to +1)")
 plt.legend()
 plt.show()
-
----
-
-## ⚠️ Notes and Reminders
-
-- **NaN / Empty Texts**: Articles with missing titles or descriptions are handled by filling with empty strings. If no text is available, sentiment defaults to `0` (neutral).
-- **Daily Cap**: Only the first 10 articles per day are kept to avoid bias from high-volume news days.
-- **Model Limitations**:
-  - The sentiment model is trained on financial news but may misclassify nuanced or ambiguous headlines.
-  - Scores are **continuous** between -1 and +1, but interpretation should be contextual.
-- **Performance**: Running inference on large datasets may be slow without GPU acceleration.
-
----
-
-## 📊 Use Cases
-
-- **Market Sentiment Index**: Use `daily_avg` as a proxy for investor mood around SPY.
-- **Event Studies**: Align sentiment spikes with SPY returns or volatility.
-- **Feature Engineering**: Incorporate sentiment scores into trading models alongside price/volume features.
 
 ---

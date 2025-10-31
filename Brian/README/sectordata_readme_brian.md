@@ -165,28 +165,6 @@ Standardized (z-scored) versions of the above features, using a **252-day rollin
 
 ---
 
-## How to Use the CSV
-
-Here’s a simple example of how to visualize one of the engineered features:
-
-```python
-import pandas as pd
-import matplotlib.pyplot as plt
-
-# Load dataset
-df = pd.read_csv("market_features_master.csv", parse_dates=["Date"], index_col="Date")
-
-# Plot Defensive vs Cyclical ratio
-plt.figure(figsize=(12,6))
-plt.plot(df.index, df["Features_DefCyc_Ratio"], label="Defensive vs Cyclical Ratio", color="green")
-plt.title("Defensive vs Cyclical Ratio Over Time")
-plt.xlabel("Date")
-plt.ylabel("Ratio")
-plt.legend()
-plt.show()
-
-
----
 
 ## 📊 Feature Intuition Table
 
@@ -209,4 +187,26 @@ This table explains the intuition behind each engineered feature, its meaning, a
 | **Crude_60dRet**      | 60‑day return of crude oil | Oil strength can mean growth or inflation | ↑ Crude → SPY ↑ if growth, ↓ if inflation fears |
 | **Copper_60dRet**     | 60‑day return of copper | “Dr. Copper” = global growth barometer | ↑ Copper → SPY ↑ |
 | **Seasonality**       | Avg monthly SPY returns | Captures recurring calendar effects | ↑ Seasonality (positive months) → SPY ↑ |
+
+---
+
+## How to Use the CSV
+
+Here’s a simple example of how to visualize one of the engineered features:
+
+```python
+import pandas as pd
+import matplotlib.pyplot as plt
+
+# Load dataset
+df = pd.read_csv("market_features_master.csv", parse_dates=["Date"], index_col="Date")
+
+# Plot Defensive vs Cyclical ratio
+plt.figure(figsize=(12,6))
+plt.plot(df.index, df["Features_DefCyc_Ratio"], label="Defensive vs Cyclical Ratio", color="green")
+plt.title("Defensive vs Cyclical Ratio Over Time")
+plt.xlabel("Date")
+plt.ylabel("Ratio")
+plt.legend()
+plt.show()
 
