@@ -55,22 +55,138 @@ The file `market_features_master.csv` contains a **multi-level column structure*
 - **Features**: Engineered features (see table below).
 - **ZScores**: Standardized versions of features.
 
-### Example Usage in Python
+
+## CSV Format
+
+The CSV is a **multi-level column dataset** with the following groups and columns:
+
+---
+
+### 🟦 Prices
+Daily adjusted close prices for SPY and sector ETFs.
+
+| Column         | Description                                      |
+|----------------|--------------------------------------------------|
+| `Prices_SPY`   | SPDR S&P 500 ETF (broad market benchmark).       |
+| `Prices_XLK`   | Technology Select Sector ETF.                    |
+| `Prices_XLF`   | Financials Select Sector ETF.                    |
+| `Prices_XLE`   | Energy Select Sector ETF.                        |
+| `Prices_XLV`   | Health Care Select Sector ETF.                   |
+| `Prices_XLU`   | Utilities Select Sector ETF.                     |
+| `Prices_XLY`   | Consumer Discretionary Select Sector ETF.        |
+| `Prices_XLP`   | Consumer Staples Select Sector ETF.              |
+| `Prices_XLB`   | Materials Select Sector ETF.                     |
+| `Prices_XLRE`  | Real Estate Select Sector ETF.                   |
+| `Prices_XLC`   | Communication Services Select Sector ETF.        |
+
+---
+
+### 🟩 Returns
+Daily percentage returns for SPY and sector ETFs.
+
+| Column          | Description                                      |
+|-----------------|--------------------------------------------------|
+| `Returns_SPY`   | Daily % return of SPY.                           |
+| `Returns_XLK`   | Daily % return of XLK.                           |
+| `Returns_XLF`   | Daily % return of XLF.                           |
+| `Returns_XLE`   | Daily % return of XLE.                           |
+| `Returns_XLV`   | Daily % return of XLV.                           |
+| `Returns_XLU`   | Daily % return of XLU.                           |
+| `Returns_XLY`   | Daily % return of XLY.                           |
+| `Returns_XLP`   | Daily % return of XLP.                           |
+| `Returns_XLB`   | Daily % return of XLB.                           |
+| `Returns_XLRE`  | Daily % return of XLRE.                          |
+| `Returns_XLC`   | Daily % return of XLC.                           |
+
+---
+
+### 🟨 Ratios
+Relative strength ratios of sectors vs SPY.
+
+| Column        | Description                                      |
+|---------------|--------------------------------------------------|
+| `Ratios_XLK_SPY` | XLK / SPY ratio (tech vs market).             |
+| `Ratios_XLU_SPY` | XLU / SPY ratio (utilities vs market).        |
+| `Ratios_XLF_SPY` | XLF / SPY ratio (financials vs market).       |
+
+---
+
+### 🟥 Features
+Engineered macro/market features.
+
+| Column                  | Description                                                                 |
+|--------------------------|-----------------------------------------------------------------------------|
+| `Features_SPY_Return`    | Daily % return of SPY (redundant for convenience).                          |
+| `Features_GrowthMinusDef` | Spread between growth/cyclical sectors (XLK, XLF, XLE, XLY) and defensive sectors (XLU, XLP, XLV). |
+| `Features_XLK_SPY`       | XLK / SPY ratio (duplicate from Ratios for modeling).                       |
+| `Features_XLU_SPY`       | XLU / SPY ratio (duplicate from Ratios).                                    |
+| `Features_XLF_SPY`       | XLF / SPY ratio (duplicate from Ratios).                                    |
+| `Features_Breadth`       | Number of sectors outperforming SPY over the past 60 days.                  |
+| `Features_Vol_Ratio_XLK_XLU` | Ratio of 20-day rolling volatility of XLK vs XLU.                      |
+| `Features_DGS10`         | 10-year Treasury yield proxy (`^TNX` / 10).                                 |
+| `Features_DGS5`          | 5-year Treasury yield proxy (`^FVX` / 10).                                  |
+| `Features_Spread`        | Yield curve spread (10Y – 5Y).                                              |
+| `Features_DefCyc_Ratio`  | Rolling ratio of defensive (XLP, XLU, XLV) vs cyclical (XLK, XLF, XLY).     |
+| `Features_Avg_Sector_Corr` | 60-day rolling average of cross-sector correlations.                      |
+| `Features_Crude_60dRet`  | 60-day return of crude oil futures (`CL=F`).                                |
+| `Features_Copper_60dRet` | 60-day return of copper futures (`HG=F`).                                   |
+
+---
+
+### 🟪 ZScores
+Standardized (z-scored) versions of the above features, using a **252-day rolling mean and standard deviation**.
+
+| Column                   | Description                                                                 |
+|---------------------------|-----------------------------------------------------------------------------|
+| `ZScores_SPY_Return`      | Z-score of SPY daily return.                                                |
+| `ZScores_GrowthMinusDef`  | Z-score of Growth–Defensive spread.                                         |
+| `ZScores_XLK_SPY`         | Z-score of XLK/SPY ratio.                                                   |
+| `ZScores_XLU_SPY`         | Z-score of XLU/SPY ratio.                                                   |
+| `ZScores_XLF_SPY`         | Z-score of XLF/SPY ratio.                                                   |
+| `ZScores_Breadth`         | Z-score of breadth measure.                                                 |
+| `ZScores_Vol_Ratio_XLK_XLU` | Z-score of volatility ratio (XLK vs XLU).                                |
+| `ZScores_DGS10`           | Z-score of 10Y Treasury yield proxy.                                        |
+| `ZScores_DGS5`            | Z-score of 5Y Treasury yield proxy.                                         |
+| `ZScores_Spread`          | Z-score of yield curve spread (10Y – 5Y).                                   |
+| `ZScores_DefCyc_Ratio`    | Z-score of defensive vs cyclical ratio.                                     |
+| `ZScores_Avg_Sector_Corr` | Z-score of average sector correlation.                                      |
+| `ZScores_Crude_60dRet`    | Z-score of 60-day crude oil return.                                         |
+| `ZScores_Copper_60dRet`   | Z-score of 60-day copper return.                                            |
+
+---
+
+### Example rows
+
+| Date       | Prices_SPY | Prices_XLB | ... | Returns_SPY | Ratios_XLK_SPY | Features_SPY_Return | Features_Breadth | ZScores_SPY_Return | ... |
+|------------|------------|------------|-----|-------------|----------------|----------------------|------------------|---------------------|-----|
+| 2015-02-01 | 171.09     | 39.19      | ... | NaN         | 0.2119         | NaN                  | 0                | NaN                 | ... |
+| 2015-05-01 | 168.00     | 38.19      | ... | NaN         | 0.2125         | NaN                  | 0                | NaN                 | ... |
+| 2015-06-01 | 166.42     | 37.85      | ... | NaN         | 0.2120         | NaN                  | 0                | NaN                 | ... |
+
+---
+
+## How to Use the CSV
+
+Here’s a simple example of how to visualize one of the engineered features:
 
 ```python
 import pandas as pd
+import matplotlib.pyplot as plt
 
 # Load dataset
-df = pd.read_csv("market_features_master.csv", index_col=0, parse_dates=True)
+df = pd.read_csv("market_features_master.csv", parse_dates=["Date"], index_col="Date")
 
-# Access engineered features
-features = df["Features"]
+# Plot Defensive vs Cyclical ratio
+plt.figure(figsize=(12,6))
+plt.plot(df.index, df["Features_DefCyc_Ratio"], label="Defensive vs Cyclical Ratio", color="green")
+plt.title("Defensive vs Cyclical Ratio Over Time")
+plt.xlabel("Date")
+plt.ylabel("Ratio")
+plt.legend()
+plt.show()
 
-# Example: Plot Growth vs Defensive feature
-features["GrowthMinusDef"].plot(title="Growth vs Defensive Rotation")
 
-
-
+---
 
 ## 📊 Feature Intuition Table
 

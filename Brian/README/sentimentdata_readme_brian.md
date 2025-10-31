@@ -41,17 +41,47 @@ The output is a dataset of news articles (limited to 10 per day) with sentiment 
 
 ## 📂 Example Output Structure
 
-### daily_sentiment_score.csv
-| date       | time (UTC)         | title | description | text | sentiment_score |
-|------------|--------------------|-------|-------------|------|-----------------|
-| 2015-01-02 | 2015-01-02 14:30:00| ...   | ...         | ...  | -0.25           |
-| 2015-01-02 | 2015-01-02 15:10:00| ...   | ...         | ...  | +0.80           |
+The CSV contains the following columns:
 
-### daily_average_sentiment_score.csv: 
-| date       | sentiment_score |
-|------------|-----------------|
-| 2015-01-02 | 0.27            |
-| 2015-01-05 | -0.12           |
+| Column           | Type      | Description                                                                 |
+|------------------|-----------|-----------------------------------------------------------------------------|
+| `date`           | datetime  | Trading day (UTC normalized).                                               |
+| `time`           | datetime  | Timestamp of the news article (UTC).                                        |
+| `sentiment_score`| float     | Continuous sentiment score between **-1 (negative)** and **+1 (positive)**. |
+
+### Example rows
+
+| date       | time                | sentiment_score |
+|------------|---------------------|-----------------|
+| 2015-01-01 | 00:00:00+00:00      | -0.330553       |
+| 2015-01-02 | 00:00:00+00:00      | -0.100757       |
+| 2015-01-03 | 00:00:00+00:00      | -0.109538       |
+| 2015-01-04 | 00:00:00+00:00      | -0.398740       |
+| 2015-01-05 | 00:00:00+00:00      | -0.171743       |
+
+---
+
+## 📊 Visualizing Daily Sentiment Trends
+
+You can use the dataset to plot how sentiment evolves over time.  
+The example below shows how to load the CSV and create a simple time series chart.
+
+```python
+import pandas as pd
+import matplotlib.pyplot as plt
+
+# Load dataset
+df = pd.read_csv("daily_sentiment.csv", parse_dates=["date"])
+
+# Plot daily sentiment trend
+plt.figure(figsize=(12,6))
+plt.plot(df["date"], df["sentiment_score"], label="Daily Avg Sentiment", color="blue")
+plt.axhline(0, color="red", linestyle="--", label="Neutral")
+plt.title("SPY News Sentiment Over Time")
+plt.xlabel("Date")
+plt.ylabel("Sentiment Score (-1 to +1)")
+plt.legend()
+plt.show()
 
 ---
 
@@ -73,8 +103,3 @@ The output is a dataset of news articles (limited to 10 per day) with sentiment 
 - **Feature Engineering**: Incorporate sentiment scores into trading models alongside price/volume features.
 
 ---
-
-## ✅ Summary
-
-This pipeline provides a **daily sentiment dataset** derived from SPY-related Tiingo news, scored with a **state-of-the-art NLP model**.  
-It can be used for **quantitative research, trading strategies, or risk monitoring** where news sentiment is a key driver.
