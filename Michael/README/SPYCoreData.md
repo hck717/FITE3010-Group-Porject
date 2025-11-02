@@ -1,0 +1,71 @@
+# Original Data
+
+- `spy_ohlcv_1drth_20141231_20250602.csv` downloaded from QC with `download_from_QC.py`.
+    - Content: SPY OHLCV
+    - Resolution: Daily
+    - Timezone: America/New_York
+    - Coverage: Trading Hour from 2024.12.31 to 2025.06.02
+    - Source: QuantConnect
+- `spy_ohlcv_1h_20141231_20250602.csv` downloaded from QC with `download_from_QC.py`.
+    - Content: SPY OHLCV
+    - Resolution: Hourly
+    - Timezone: America/New_York
+    - Coverage: Full Hours from 2014.12.31 to 2025.06.02
+    - Source: QuantConnect
+- `spy_ohlcv_1m910_20241231_20250602.csv` downloaded from QC with `download_from_QC.py`.
+    - Content: SPY OHLCV
+    - Resolution: Minute
+    - Timezone: America/New_York
+    - Coverage: Full Minutes 9:00-10:00 from 2014.12.31 to 2025.06.02
+    - Source: QuantConnect
+- `calender_time_sequence.csv` are main events covering the following aspects and in time sequence
+    - Category:
+        - CPI Release
+        - PCE Release
+        - NFP Release
+        - US Presidential Election
+        - US Market Summit
+            - FOMC
+            - G7/G20
+            - Jackson Hole
+            - OPEC+
+            - APEC
+            - WTO MC10
+        - SPY OpEx Quarterly
+        - Chinese Holiday
+        - US Holiday
+        - SPY Component Report
+- `calender_event_sequence.csv` are main events sorted by event categories.
+
+# Processed Data
+
+- `spy_rth_gaps_overnight_20141231-20250602.csv` processed with `gaps.py`
+    - Content: SPY RTH Overnight Gaps
+    - Resolution: Daily
+    - Timezone: America/New_York
+    - Coverage: Trading Hour from 2014.12.31 to 2025.06.02
+    - Source: Processed from `spy_ohlcv_1drth_20141231_20250602.csv`
+- `spy_rth_indicators_20141231-20250602.csv` processed with `basic_feats.py`
+    - Content: SPY RTH Basic Indicators
+    - Resolution: Daily
+    - Timezone: America/New_York
+    - Coverage: Trading Hour from 2014.12.31 to 2025.06.02
+    - Source: Processed from `spy_ohlcv_1drth_20141231_20250602.csv`
+- `spy_rth_trend_liquidity_pressure_20141231-20250602.csv` processed with `liquidity.py`
+    - Content: SPY RTH Trend and Liquidity Pressure Indicators
+    - Resolution: Daily
+    - Timezone: America/New_York
+    - Coverage: Trading Hour from 2014.12.31 to 2025.06.02
+    - Source: Processed from `spy_ohlcv_1drth_20141231_20250602.csv`
+- `spy_rth_trend_meanrev_20141231-20250602.csv` processed with `trend.py`
+    - Content: SPY RTH Trend and Mean Reversion Indicators
+    - Resolution: Daily
+    - Timezone: America/New_York
+    - Coverage: Trading Hour from 2014.12.31 to 2025.06.02
+    - Source: Processed from `spy_ohlcv_1drth_20141231_20250602.csv`
+- `spy_rth_volatility_20141231-20250602.csv` processed with `volatility.py`
+    - Content: SPY RTH Volatility Indicators
+    - Resolution: Daily
+    - Timezone: America/New_York
+    - Coverage: Trading Hour from 2014.12.31 to 2025.06.02
+    - Source: Processed from `spy_ohlcv_1drth_20141231_20250602.csv`
