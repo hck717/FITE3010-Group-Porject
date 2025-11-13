@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python aggregate_all_data.py:*)",
+      "Bash(pip install:*)",
+      "Bash(dir \"C:\\Github\\FITE3010-Group-Porject\\Nayoung\\Data\\spy_complete_dataset.csv\")",
+      "Bash(python -m pip install:*)",
+      "Bash(python -c:*)",
+      "Bash(findstr:*)",
+      "Bash(Select-String -Pattern \"(scikit|hmmlearn|pandas|numpy|matplotlib|seaborn|jupyter)\")",
+      "Bash(pip show:*)",
+      "Bash(python -m ipykernel install:*)",
+      "Bash(python test_environment.py:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
