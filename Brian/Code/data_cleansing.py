@@ -10,6 +10,9 @@
 
 import pandas as pd
 import numpy as np
+import ssl
+
+ssl._create_default_https_context = ssl._create_stdlib_context
 
 # ------------------------------------------------------------------
 # 1. CONFIG
@@ -190,8 +193,8 @@ print(final_miss.round(2).sort_values(ascending=False).head(10))
 parquet_file = "master_spy_clean_final.parquet"
 csv_file = "master_spy_clean_final.csv"
 
-merged.to_parquet(parquet_file, index=False)
-merged.to_csv(csv_file, index=False)
+# merged.to_parquet(parquet_file, index=False)
+merged.to_csv(csv_file, index=False, header=True)
 
 print(f"\nSAVED:")
 print(f"  → {parquet_file} (Parquet, fast & small)")
